@@ -1,6 +1,8 @@
 # 发布清单
 
-## 一、PyPI
+## 一、PyPI（暂缓，等有人问「怎么装」再发）
+
+当前安装方式是 `pip install "git+https://…/#subdirectory=python"`，无需 PyPI。
 
 名字 `read-anything` 在 PyPI 上可用（查过）。发布后，用户只需：
 

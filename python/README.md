@@ -96,28 +96,31 @@ It does not have the most coverage. The difference is in the last column.
 
 ### Install
 
-Python 3.10 or newer, and Chrome or Edge.
+Python 3.10 or newer, and Chrome or Edge. No clone needed.
 
 ```bash
-cd python
-python3 -m venv .venv
-./.venv/bin/pip install -e .
+python3 -m venv ~/.read-anything/venv
+~/.read-anything/venv/bin/pip install "git+https://github.com/poiuye-dotcom/read-anything#subdirectory=python"
 ```
 
-For an MCP client (DSH, Claude, Cursor), set the interpreter in `bundle/cordis.patch.yml`:
-
-```yaml
-command: /absolute/path/to/python/.venv/bin/python
-args: ["-m", "read_anything.mcp"]
-```
-
-In DSH, use **Plugins → Add plugin** and pick the `bundle/` directory. Any other client:
+For any MCP client (Claude, Cursor and others):
 
 ```json
 { "mcpServers": { "readanything": {
-    "command": "/absolute/path/to/python/.venv/bin/python",
+    "command": "/Users/<you>/.read-anything/venv/bin/python",
     "args": ["-m", "read_anything.mcp"] } } }
 ```
+
+DSH needs the plugin shape, which lives in the repo:
+
+```bash
+git clone https://github.com/poiuye-dotcom/read-anything
+```
+
+Point `command` in `bundle/cordis.patch.yml` at that interpreter, then **Plugins → Add plugin**
+and pick the `bundle/` directory.
+
+To work on the code, clone and run `pip install -e python/`.
 
 ### Usage
 

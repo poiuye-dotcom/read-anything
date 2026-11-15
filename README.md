@@ -94,28 +94,31 @@ $ python -m read_anything.ra list zhihu "嵌入式 FPGA 就业" --limit 3
 
 ### 安装
 
-需要 Python 3.10 以上，和一个 Chrome 或 Edge。
+需要 Python 3.10 以上，和一个 Chrome 或 Edge。不用 clone 仓库。
 
 ```bash
-cd python
-python3 -m venv .venv
-./.venv/bin/pip install -e .
+python3 -m venv ~/.read-anything/venv
+~/.read-anything/venv/bin/pip install "git+https://github.com/poiuye-dotcom/read-anything#subdirectory=python"
 ```
 
-接进 MCP 客户端（DSH、Claude、Cursor），在 `bundle/cordis.patch.yml` 里填解释器路径：
-
-```yaml
-command: /绝对路径/python/.venv/bin/python
-args: ["-m", "read_anything.mcp"]
-```
-
-DSH 里用 **Plugins → Add plugin** 选 `bundle/` 目录。其他客户端写 JSON：
+接进 MCP 客户端（Claude、Cursor 等），填这个解释器：
 
 ```json
 { "mcpServers": { "readanything": {
-    "command": "/绝对路径/python/.venv/bin/python",
+    "command": "/Users/<你>/.read-anything/venv/bin/python",
     "args": ["-m", "read_anything.mcp"] } } }
 ```
+
+在 DSH 里要用插件形态，需要仓库里的 `bundle/` 目录：
+
+```bash
+git clone https://github.com/poiuye-dotcom/read-anything
+```
+
+把 `bundle/cordis.patch.yml` 里的 `command` 指向上面那个解释器，然后用 **Plugins → Add plugin**
+选 `bundle/` 目录。
+
+想改代码的，clone 之后 `pip install -e python/`。
 
 ### 用法
 
