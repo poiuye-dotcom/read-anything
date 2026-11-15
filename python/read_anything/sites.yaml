@@ -1,0 +1,157 @@
+# read-anything 站点配置
+# 新增平台 = 加一段 yaml，不写代码。
+#
+# type: dom    —— 用浏览器渲染后读 DOM（需要登录的站点都走这条）
+# type: api    —— 走公开接口（暂未实现通用版，B站见 bili.py）
+
+defaults:
+  retry: 3                # 失败重试次数
+  backoff: [2, 6, 15]     # 每次重试前等几秒
+  crawl_delay: 2.0        # 同一站点两次请求的最小间隔（秒）
+  settle: 3.0             # 页面加载后再等多久
+  scrolls: 3              # 列表页向下滚动次数（触发懒加载）
+  scroll_pause: 1.2
+
+sites:
+  xhs:
+    name: 小红书
+    search_url: "https://www.rednote.com/search_result?keyword={q}&source=web_search_result_notes"
+    # 国际网络下会跳 rednote.com，两个域名都认
+    login:
+      cookie: web_session
+      urls: ["https://www.rednote.com", "https://www.xiaohongshu.com"]
+    container: "section.note-item"
+    fields:
+      title: ".title"
+      author: ".name"
+      likes: ".count"
+    link: "a.cover"
+    detail:
+      title: "#detail-title"
+      body: "#detail-desc"
+    comments:
+      container: ".comment-item"
+      fields: {user: ".name", text: ".content", likes: ".like .count"}
+      scroll_target: ".note-scroller"
+
+  zhihu:
+    name: 知乎
+    mirror_hint: ["知乎 镜像站 可用 2026", "知乎 无登录 阅读 方法"]
+    search_url: "https://www.zhihu.com/search?type=content&q={q}"
+    login:
+      cookie: z_c0
+      urls: ["https://www.zhihu.com"]
+    container: ".SearchResult-Card"
+    fields:
+      title: "h2"
+      excerpt: ".RichText"
+    link: "a[href*='/question/']"
+    detail:
+      title: ".QuestionHeader-title"
+      body: ".RichText"
+    comments:
+      api: "https://www.zhihu.com/api/v4/answers/{answer_id}/comments?limit={limit}&offset={offset}"
+
+  handshake:
+    name: Handshake（校内）
+    requires_headed: true     # Cloudflare 会拦无头浏览器
+    # Handshake 按学校分域：把 example 换成你学校的子域；不用这个站可忽略
+    school: example
+    search_url: "https://{school}.joinhandshake.com/job-search?page={page}&per_page=25&workAuthorization=openToUSVisaSponsorship&experienceLevel=noExperienceRequired"
+    login:
+      check_url: "https://{school}.joinhandshake.com/stu/postings"
+      redirect_markers: ["/login", "/access"]
+    container: "a[href*='/job-search/']"
+    mode: anchors              # 卡片是链接本身，向上找有文字的祖先
+    fields: {}
+    paginate: {param: page, start: 1, max: 12}
+
+  reddit:
+    name: Reddit
+    mirror_hint: ["redlib 实例 可用 2026", "reddit mirror site working"]
+    search_url: "https://www.reddit.com/search.rss?q={q}&sort=relevance&t=all"
+    type: rss
+    # .rss 是公开 Atom：第 1 条是原帖，其余是评论
+
+  bilibili:
+    name: B站
+    type: custom              # 见 bili.py（接口 + buvid3 cookie）
+
+  v2ex:
+    name: V2EX
+    type: api
+    # sov2ex 是社区自建的公开搜索，覆盖全站主题
+    search_url: "https://www.sov2ex.com/api/search?q={q}&size=10"
+    items_path: hits
+    item_path: _source
+    fields: {title: title, text: content, id: id}
+    url_template: "https://www.v2ex.com/t/{id}"
+    strip_html: true
+
+  github:
+    name: GitHub
+    type: api
+    # 无 token 时限速 10 次/分钟，够查线索
+    search_url: "https://api.github.com/search/repositories?q={q}&sort=stars&per_page=10"
+    items_path: items
+    fields: {title: full_name, text: description}
+    url_template: "https://github.com/{title}"
+
+  tieba:
+    name: 贴吧
+    mirror_hint: ["贴吧 网页版 免登录", "tieba 镜像"]
+    type: dom
+    # 只能按"吧"读列表，没有可用的关键词搜索
+    search_url: "https://tieba.baidu.com/f?kw={q}&ie=utf-8&pn=0"
+    container: "a[href*='/p/']"
+    mode: anchors
+    title_line: 0
+    fields: {}
+    exclude: "^(置顶|公告|【公告】)"   # 置顶广告滚出去
+    dedupe_key: path                  # /p/123?showComment=1 和 /p/123 是同一条
+    scrolls: 2
+
+  csdn:
+    name: CSDN
+    type: api                 # 公开接口，不需要登录
+    search_url: "https://so.csdn.net/api/v3/search?q={q}&t=all&p=1"
+    items_path: result_vos
+    fields: {title: title, url: url, text: digest}
+    strip_html: true
+
+  weibo:
+    name: 微博
+    type: api
+    via: browser              # 要 visitor cookie，交给浏览器
+    search_url: "https://m.weibo.cn/api/container/getIndex?containerid=100103type%3D1%26q%3D{q}&page_type=searchall"
+    items_path: data.cards
+    item_path: mblog           # cards[].mblog
+    fields: {title: text, url: id}   # text 是 HTML，要清洗
+    strip_html: true
+    url_template: "https://m.weibo.cn/detail/{url}"
+
+  youtube:
+    name: YouTube
+    type: ytdlp
+    search_url: "ytsearch{limit}:{q}"
+
+  x:
+    name: X / Twitter
+    mirror_hint: ["nitter 实例 2026 可用", "x.com 免登录 浏览"]
+    type: dom
+    status: needs_login
+    search_url: "https://x.com/search?q={q}&f=live"
+    login: {cookie: auth_token, urls: ["https://x.com"]}
+    container: "article[data-testid='tweet']"
+    fields: {title: "[data-testid='tweetText']"}
+    link: "a[href*='/status/']"
+
+  linkedin:
+    name: LinkedIn（岗位）
+    type: custom              # 见 jobs.py（JobSpy 公开搜索 + CDP 详情）
+    status: via_jobs_py
+
+  gongzhonghao:
+    name: 微信公众号
+    type: custom
+    status: hard              # 需要微信客户端或搜狗入口，暂不支持

@@ -1,0 +1,52 @@
+# 意图 → 查询改写模板
+#
+# 为什么需要它：口语问题直接当站内查询词，命中率极低。
+# 真人不会写"我想去大厂做嵌入式该怎么准备"，他们会写"嵌入式 面试 真实"。
+#
+# {t} = 抽出来的实体（公司 / 专业 / 岗位 / 技术词）
+
+intents:
+  school:
+    label: 学校与专业
+    keywords: [学校, 专业, 就读, 选课, 转专业, 申请, 录取, 排名, 校区, 生活, 租房]
+    sites: [xhs, zhihu, reddit]
+    templates:
+      xhs: ["{t} 就读体验", "{t} 真实 感受", "{t} 劝退"]
+      zhihu: ["{t} 怎么样", "{t} 值不值得读", "{t} 就业"]
+      reddit: ["{t} experience", "{t} worth it"]
+
+  job:
+    label: 求职与实习
+    keywords: [实习, 工作, 求职, 岗位, 面试, offer, 薪资, 简历, 秋招, 春招, 内推, 找工]
+    sites: [xhs, zhihu, reddit]
+    templates:
+      xhs: ["{t} 面试 真实", "{t} 实习 体验", "{t} 求职 难度"]
+      zhihu: ["{t} 就业 前景", "{t} 值得去吗", "如何进 {t}"]
+      reddit: ["{t} interview", "{t} internship reddit"]
+
+  tech:
+    label: 技术与工具
+    keywords: [框架, 语言, 库, 工具, 报错, 性能, 架构, 算法, 芯片, 电路, 嵌入式]
+    sites: [zhihu, reddit, bilibili]
+    templates:
+      zhihu: ["{t} 原理", "{t} 对比", "{t} 坑"]
+      reddit: ["{t} vs", "{t} production experience"]
+      bilibili: ["{t} 教程", "{t} 实测"]
+
+  visa:
+    label: 身份与政策
+    keywords: [签证, CPT, OPT, H1B, 绿卡, 身份, 移民, 回国, 留学]
+    sites: [xhs, zhihu, reddit]
+    templates:
+      xhs: ["{t} 最新", "{t} 经验 2026", "{t} 被拒"]
+      zhihu: ["{t} 政策 解读", "{t} 实际操作"]
+      reddit: ["{t} timeline", "{t} experience"]
+
+  money:
+    label: 钱与奖励
+    keywords: [薪, 奖, 经费, 学费, 成本, 报销, funding, 奖学金]
+    sites: [xhs, zhihu, reddit]
+    templates:
+      xhs: ["{t} 到手", "{t} 真实 收入"]
+      zhihu: ["{t} 水平", "{t} 值不值"]
+      reddit: ["{t} salary", "{t} compensation"]

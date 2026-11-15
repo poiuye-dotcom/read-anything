@@ -1,0 +1,14 @@
+# read-anything：把本地 MCP 服务器接进 DSH。
+# 唯一需要改的是 command。
+# pip install read-anything 之后，任何解释器路径都行。
+- insert:
+    - id: read-anything-mcp
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: readanything
+        transport: stdio
+        command: <VENV_PYTHON>
+        args:
+          - -m
+          - read_anything.mcp
+        failOnStartupError: true
