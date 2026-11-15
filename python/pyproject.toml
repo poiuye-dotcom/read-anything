@@ -34,8 +34,8 @@ dependencies = [
 bilibili = ["yt-dlp"]
 
 [project.urls]
-Homepage = "https://github.com/yourname/read-anything"
-Source = "https://github.com/yourname/read-anything"
+Homepage = "https://github.com/poiuye-dotcom/read-anything"
+Source = "https://github.com/poiuye-dotcom/read-anything"
 
 [project.scripts]
 read-anything = "read_anything.ra:main"
